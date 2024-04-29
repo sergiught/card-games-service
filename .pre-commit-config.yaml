@@ -1,0 +1,10 @@
+repos:
+  - repo: local
+    hooks:
+      - id: commitlint
+        name: Conventional Commits Checker
+        description: Checks commits for conventional commits format, requires github.com/conventionalcommit/commitlint
+        language: system
+        entry: make lint-commits
+        stages:
+          - commit-msg
