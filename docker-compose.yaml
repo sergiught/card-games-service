@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:16.2-alpine3.19
+    ports:
+      - "5432:5432"
+    environment:
+      LC_ALL: C.UTF-8
+      POSTGRES_USER: dealer
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: card_decks
