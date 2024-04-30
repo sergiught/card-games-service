@@ -56,9 +56,8 @@ func (deckCtx *DeckContext) iCreateADeckOfFrenchCardsWithCards(
 	return godog.ErrPending
 }
 
-func (deckCtx *DeckContext) iShouldReceiveNCards(ctx context.Context, cardsCount int) error {
+func (deckCtx *DeckContext) iShouldReceiveNCards(ctx context.Context, cardsCount float64) error {
 	require.NotEmpty(godog.T(ctx), deckCtx.response)
-
 	assert.Contains(godog.T(ctx), deckCtx.response, "deck_id")
 	assert.Contains(godog.T(ctx), deckCtx.response, "shuffled")
 	assert.Contains(godog.T(ctx), deckCtx.response, "remaining")
