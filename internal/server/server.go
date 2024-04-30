@@ -3,12 +3,13 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
 type (
@@ -16,6 +17,7 @@ type (
 	Server struct {
 		config  Config
 		handler http.Handler
+		logger  zerolog.Logger
 	}
 
 	// Config holds the configuration settings for the HTTP Server.
@@ -28,10 +30,11 @@ type (
 )
 
 // New returns a new HTTP Server.
-func New(config Config, handler http.Handler) *Server {
+func New(config Config, log zerolog.Logger, handler http.Handler) *Server {
 	return &Server{
 		config:  config,
 		handler: handler,
+		logger:  log,
 	}
 }
 
@@ -55,16 +58,16 @@ func (s *Server) Start() error {
 
 	// Start the service listening for requests.
 	go func() {
-		log.Printf("server: listening on port %q", api.Addr)
+		s.logger.Info().Msgf("server listening on port %q", api.Addr)
 		serverErrors <- api.ListenAndServe()
 	}()
 
 	// Block and wait for shutdown.
 	select {
 	case err := <-serverErrors:
-		return fmt.Errorf("server: encountered an error: %w", err)
+		return fmt.Errorf("server encountered an error: %w", err)
 	case sig := <-shutdown:
-		log.Printf("server: shutting down after receiving %+v", sig)
+		s.logger.Info().Msgf("server shutting down after receiving %+v", sig)
 
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(context.Background(), s.config.ShutdownTimeout)
@@ -73,7 +76,7 @@ func (s *Server) Start() error {
 		// Ask listener to shut down and shed load.
 		if err := api.Shutdown(ctx); err != nil {
 			_ = api.Close()
-			return fmt.Errorf("server: failed to shutdown gracefully: %w", err)
+			return fmt.Errorf("server failed to shutdown gracefully: %w", err)
 		}
 	}
 

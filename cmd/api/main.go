@@ -1,21 +1,24 @@
 package main
 
 import (
-	"log"
+	stdLog "log"
 
 	"github.com/sergiught/card-games-service/internal/config"
+	"github.com/sergiught/card-games-service/internal/logger"
 	"github.com/sergiught/card-games-service/internal/server"
 )
 
 func main() {
 	configuration, err := config.LoadFromEnv()
 	if err != nil {
-		log.Fatalf("failed to load env vars: %v", err)
+		stdLog.Fatalf("failed to load env vars: %v", err)
 	}
 
-	httpServer := server.New(configuration.Server, nil)
+	log := logger.New(configuration.Environment)
+
+	httpServer := server.New(configuration.Server, log, nil)
 
 	if err := httpServer.Start(); err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("server exiting")
 	}
 }
