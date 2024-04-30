@@ -5,7 +5,9 @@ go 1.22.2
 require (
 	github.com/cucumber/godog v0.14.1
 	github.com/joho/godotenv v1.5.1
+	github.com/julienschmidt/httprouter v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/nicklaw5/go-respond v1.6.0
 	github.com/rs/zerolog v1.32.0
 	github.com/stretchr/testify v1.9.0
 )

@@ -5,6 +5,7 @@ import (
 
 	"github.com/sergiught/card-games-service/internal/config"
 	"github.com/sergiught/card-games-service/internal/logger"
+	"github.com/sergiught/card-games-service/internal/router"
 	"github.com/sergiught/card-games-service/internal/server"
 )
 
@@ -16,7 +17,9 @@ func main() {
 
 	log := logger.New(configuration.Environment)
 
-	httpServer := server.New(configuration.Server, log, nil)
+	httpRouter := router.New()
+
+	httpServer := server.New(configuration.Server, log, httpRouter)
 
 	if err := httpServer.Start(); err != nil {
 		log.Fatal().Err(err).Msg("server exiting")
