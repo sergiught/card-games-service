@@ -20,10 +20,10 @@ type (
 
 	// Config holds the configuration settings for the HTTP Server.
 	Config struct {
-		Address         string
-		ReadTimeout     time.Duration
-		WriteTimeout    time.Duration
-		ShutdownTimeout time.Duration
+		Address         string        `envconfig:"ADDRESS" default:"0.0.0.0:8000"`
+		ReadTimeout     time.Duration `envconfig:"READ_TIMEOUT" default:"5s"`
+		WriteTimeout    time.Duration `envconfig:"WRITE_TIMEOUT" default:"5s"`
+		ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"5s"`
 	}
 )
 

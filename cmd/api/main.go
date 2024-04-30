@@ -2,20 +2,18 @@ package main
 
 import (
 	"log"
-	"time"
 
+	"github.com/sergiught/card-games-service/internal/config"
 	"github.com/sergiught/card-games-service/internal/server"
 )
 
 func main() {
-	configuration := server.Config{
-		Address:         "0.0.0.0:8000",
-		ReadTimeout:     5 * time.Second,
-		WriteTimeout:    5 * time.Second,
-		ShutdownTimeout: 5 * time.Second,
+	configuration, err := config.LoadFromEnv()
+	if err != nil {
+		log.Fatalf("failed to load env vars: %v", err)
 	}
 
-	httpServer := server.New(configuration, nil)
+	httpServer := server.New(configuration.Server, nil)
 
 	if err := httpServer.Start(); err != nil {
 		log.Fatal(err)
