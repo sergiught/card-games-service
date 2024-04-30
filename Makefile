@@ -21,6 +21,10 @@ $(GO_BIN)/migrate:
 lint-commits: $(GO_BIN)/commitlint
 	@commitlint lint
 
+test-features:
+	@echo "==> Running feature tests"
+	@go test -v -race -count=1 -timeout=10m -run TestFeatures ./cmd/api/main_test.go
+
 dev-migrate-create: $(GO_BIN)/migrate
 	@echo "==> Creating database migration files"
 	@migrate create -ext "sql" -dir ${DB_MIGRATIONS_PATH} ${DB_MIGRATIONS_FILE_NAME}
