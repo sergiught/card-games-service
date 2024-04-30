@@ -8,3 +8,12 @@ repos:
         entry: make lint-commits
         stages:
           - commit-msg
+
+      - id: golangci-lint
+        name: Go Linter
+        description: Runs `golangci-lint`, requires github.com/golangci/golangci-lint
+        language: system
+        entry: make lint
+        files: '(?<!\.pb)\.go$'
+        stages:
+          - commit
