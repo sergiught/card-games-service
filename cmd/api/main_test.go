@@ -5,8 +5,10 @@ import (
 
 	"github.com/cucumber/godog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/sergiught/card-games-service/features/scenario"
+	"github.com/sergiught/card-games-service/internal/config"
 )
 
 const (
@@ -16,11 +18,14 @@ const (
 )
 
 func TestFeatures(t *testing.T) {
-	ctx := scenario.NewContext(t)
+	configuration, err := config.LoadFromEnv()
+	require.NoError(t, err)
+
+	deckCtx := scenario.NewDeckContext(configuration)
 
 	suite := godog.TestSuite{
 		Name:                testSuiteName,
-		ScenarioInitializer: scenario.Initialize(ctx),
+		ScenarioInitializer: scenario.Initialize(deckCtx),
 		Options: &godog.Options{
 			Format:   testSuiteFormat,
 			Paths:    []string{testSuiteDIR},

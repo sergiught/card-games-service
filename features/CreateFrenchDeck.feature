@@ -61,8 +61,8 @@ Feature: Create a deck of French cards
       | QUEEN | DIAMONDS| QD   |
       | KING  | DIAMONDS| KD   |
 
-  Scenario: Create a partial deck of French cards
-    When I create a "partial" deck of French cards with the following cards in this order:
+  Scenario: Create a custom deck of French cards
+    When I create a "custom" deck of French cards with the following cards in this order:
       | value | suit    | code |
       | ACE   | SPADES  | AS   |
       | 2     | SPADES  | 2S   |
