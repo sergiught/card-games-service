@@ -1,7 +1,7 @@
 package config
 
 import (
-	_ "github.com/joho/godotenv/autoload"
+	_ "github.com/joho/godotenv/autoload" // Autoload env vars from a .env file.
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/sergiught/card-games-service/internal/server"
