@@ -31,7 +31,7 @@ lint-commits: $(GO_BIN)/commitlint
 
 test-features:
 	@echo "==> Running feature tests"
-	@go test -v -race -count=1 -timeout=10m -run TestFeatures ./cmd/api/main_test.go
+	@go test -v -race -count=1 -timeout=10m -run TestFeatures/"$(FILTER)" ./cmd/api/main_test.go
 
 dev-migrate-create: $(GO_BIN)/migrate
 	@echo "==> Creating database migration files"
