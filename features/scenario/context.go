@@ -22,7 +22,8 @@ type DeckContext struct {
 
 	database *sql.DB
 
-	response map[string]interface{}
+	response             map[string]interface{}
+	checkCardsInResponse bool
 }
 
 // NewDeckContext returns a new DeckContext.

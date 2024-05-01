@@ -16,14 +16,15 @@ import (
 // Initialize steps for the CreateFrenchDeck.feature scenarios.
 func Initialize(deckCtx *DeckContext) func(*godog.ScenarioContext) {
 	return func(ctx *godog.ScenarioContext) {
-		ctx.When(
+		ctx.Step(
 			`^I create a "(standard|custom)"(?: and "(shuffled)")? deck of French cards$`,
 			deckCtx.iCreateADeckOfFrenchCards,
 		)
-		ctx.When(
+		ctx.Step(
 			`^I create a "(standard|custom)"(?: and "(shuffled)")? deck of French cards with the following cards in this order:$`,
 			deckCtx.iCreateADeckOfFrenchCardsWithCards,
 		)
+		ctx.When(`^I open the deck$`, deckCtx.iOpenTheDeck)
 
 		ctx.Then(`^I should receive "(\d+)" cards$`, deckCtx.iShouldReceiveNCards)
 		ctx.Then(`^I should have the following cards in this order:$`, deckCtx.iShouldHaveTheFollowingCardsInThisOrder)
@@ -77,12 +78,33 @@ func (deckCtx *DeckContext) iCreateADeckOfFrenchCardsWithCards(
 	return nil
 }
 
+func (deckCtx *DeckContext) iOpenTheDeck(ctx context.Context) error {
+	require.NotEmpty(godog.T(ctx), deckCtx.response)
+	assert.Contains(godog.T(ctx), deckCtx.response, "deck_id")
+
+	deckID := deckCtx.response["deck_id"].(string)
+	response := deckCtx.sendRequest(ctx, http.MethodGet, "/decks/"+deckID, nil)
+
+	assert.Equal(godog.T(ctx), http.StatusOK, response.StatusCode)
+
+	err := json.NewDecoder(response.Body).Decode(&deckCtx.response)
+	require.NoError(godog.T(ctx), err)
+
+	deckCtx.checkCardsInResponse = true
+
+	return nil
+}
+
 func (deckCtx *DeckContext) iShouldReceiveNCards(ctx context.Context, cardsCount float64) error {
 	require.NotEmpty(godog.T(ctx), deckCtx.response)
 	assert.Contains(godog.T(ctx), deckCtx.response, "deck_id")
 	assert.Contains(godog.T(ctx), deckCtx.response, "shuffled")
 	assert.Contains(godog.T(ctx), deckCtx.response, "remaining")
 	assert.Equal(godog.T(ctx), cardsCount, deckCtx.response["remaining"])
+
+	if deckCtx.checkCardsInResponse {
+		assert.Contains(godog.T(ctx), deckCtx.response, "cards")
+	}
 
 	return nil
 }

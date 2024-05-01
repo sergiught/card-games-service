@@ -19,6 +19,7 @@ func New(log zerolog.Logger, db *sql.DB) http.Handler {
 	deckService := deck.NewService(log, deckRepository)
 
 	router.HandlerFunc(http.MethodPost, "/decks", deckService.CreateDeck)
+	router.HandlerFunc(http.MethodGet, "/decks/:id", deckService.OpenDeck)
 
 	return router
 }
