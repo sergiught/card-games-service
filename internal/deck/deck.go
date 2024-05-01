@@ -17,13 +17,6 @@ type Deck struct {
 // Card is the interface that all card types need to implement.
 type Card interface{}
 
-// FrenchCard is a type that implements the Card interface.
-type FrenchCard struct {
-	Value string `json:"value"`
-	Suit  string `json:"suit"`
-	Code  string `json:"code"`
-}
-
 // MarshalJSON implements the json.Marshaler interface.
 func (d *Deck) MarshalJSON() ([]byte, error) {
 	type deck Deck
@@ -76,4 +69,32 @@ func (d *Deck) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+// NewWithFrenchCards creates a new deck of cards based on the specified deck type and shuffle option.
+func NewWithFrenchCards(deckType string, shuffled bool) (*Deck, error) {
+	var cards []Card
+
+	switch deckType {
+	case "custom":
+		cards = []Card{}
+	case "standard":
+		cards = GenerateStandardFrenchCardsForDeck()
+	default:
+		cards = []Card{}
+	}
+
+	if shuffled {
+		err := ShuffleCards(cards)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &Deck{
+		ID:        uuid.New(),
+		Remaining: len(cards),
+		Shuffled:  shuffled,
+		Cards:     cards,
+	}, nil
 }
