@@ -1,6 +1,7 @@
 package router
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -11,10 +12,11 @@ import (
 
 // New instantiates a new http router and
 // configures the endpoints of the service.
-func New(log zerolog.Logger) http.Handler {
+func New(log zerolog.Logger, db *sql.DB) http.Handler {
 	router := httprouter.New()
 
-	deckService := deck.NewService(log)
+	deckRepository := deck.NewRepository(db)
+	deckService := deck.NewService(log, deckRepository)
 
 	router.HandlerFunc(http.MethodPost, "/decks", deckService.CreateDeck)
 

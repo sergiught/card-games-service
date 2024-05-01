@@ -4,6 +4,7 @@ import (
 	stdLog "log"
 
 	"github.com/sergiught/card-games-service/internal/config"
+	"github.com/sergiught/card-games-service/internal/database"
 	"github.com/sergiught/card-games-service/internal/logger"
 	"github.com/sergiught/card-games-service/internal/router"
 	"github.com/sergiught/card-games-service/internal/server"
@@ -17,7 +18,12 @@ func main() {
 
 	log := logger.New(configuration.Environment)
 
-	httpRouter := router.New(log)
+	db, err := database.Connect(configuration.Database)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to connect to the database")
+	}
+
+	httpRouter := router.New(log, db)
 
 	httpServer := server.New(configuration.Server, log, httpRouter)
 

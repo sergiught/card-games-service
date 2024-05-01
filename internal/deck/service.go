@@ -10,13 +10,15 @@ import (
 
 // Service for managing card decks.
 type Service struct {
-	log zerolog.Logger
+	log        zerolog.Logger
+	repository RepositoryOperator
 }
 
 // NewService returns a new instance of Service.
-func NewService(log zerolog.Logger) *Service {
+func NewService(log zerolog.Logger, repository RepositoryOperator) *Service {
 	return &Service{
-		log: log,
+		log:        log,
+		repository: repository,
 	}
 }
 
@@ -48,6 +50,11 @@ func (s *Service) CreateDeck(w http.ResponseWriter, req *http.Request) {
 	deck, err := NewWithFrenchCards(request.DeckType, request.Shuffled)
 	if err != nil {
 		s.log.Error().Err(err).Msg("failed to create a new french card deck")
+		respond.NewResponse(w).DefaultMessage().InternalServerError(nil)
+	}
+
+	if err := s.repository.CreateDeck(req.Context(), deck); err != nil {
+		s.log.Error().Err(err).Msg("failed to persist french card deck to the database")
 		respond.NewResponse(w).DefaultMessage().InternalServerError(nil)
 	}
 
