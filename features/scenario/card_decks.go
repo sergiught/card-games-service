@@ -55,7 +55,26 @@ func (deckCtx *DeckContext) iCreateADeckOfFrenchCardsWithCards(
 	deckOrder string,
 	cardsTable *godog.Table,
 ) error {
-	return godog.ErrPending
+	shuffled := "false"
+	if deckOrder == "shuffled" {
+		shuffled = "true"
+	}
+
+	cardsFromTable := deckCtx.parseCardsTable(ctx, cardsTable)
+
+	cardsJSON, err := json.Marshal(cardsFromTable)
+	require.NoError(godog.T(ctx), err)
+
+	payload := []byte(fmt.Sprintf(`{"deck_type":%q,"shuffled":%s,"cards":%s}`, deckType, shuffled, cardsJSON))
+
+	response := deckCtx.sendRequest(ctx, http.MethodPost, "/decks", payload)
+
+	assert.Equal(godog.T(ctx), http.StatusOK, response.StatusCode)
+
+	err = json.NewDecoder(response.Body).Decode(&deckCtx.response)
+	require.NoError(godog.T(ctx), err)
+
+	return nil
 }
 
 func (deckCtx *DeckContext) iShouldReceiveNCards(ctx context.Context, cardsCount float64) error {

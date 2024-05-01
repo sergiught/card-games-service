@@ -72,12 +72,15 @@ func (d *Deck) UnmarshalJSON(data []byte) error {
 }
 
 // NewWithFrenchCards creates a new deck of cards based on the specified deck type and shuffle option.
-func NewWithFrenchCards(deckType string, shuffled bool) (*Deck, error) {
+func NewWithFrenchCards(deckType string, shuffled bool, customCards []FrenchCard) (*Deck, error) {
 	var cards []Card
 
 	switch deckType {
 	case "custom":
-		cards = []Card{}
+		cards = make([]Card, len(customCards))
+		for index, card := range customCards {
+			cards[index] = Card(card)
+		}
 	case "standard":
 		cards = GenerateStandardFrenchCardsForDeck()
 	default:

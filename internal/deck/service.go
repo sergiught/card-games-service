@@ -25,8 +25,9 @@ func NewService(log zerolog.Logger, repository RepositoryOperator) *Service {
 // CreateDeckRequest represents the parameters
 // required to create a new deck of cards.
 type CreateDeckRequest struct {
-	Shuffled bool   `json:"shuffled"`
-	DeckType string `json:"deck_type"`
+	Shuffled bool         `json:"shuffled"`
+	DeckType string       `json:"deck_type"`
+	Cards    []FrenchCard `json:"cards"`
 }
 
 // CreateDeckResponse represents the response
@@ -47,7 +48,9 @@ func (s *Service) CreateDeck(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	deck, err := NewWithFrenchCards(request.DeckType, request.Shuffled)
+	s.log.Debug().Interface("request", request).Msg("received create deck request")
+
+	deck, err := NewWithFrenchCards(request.DeckType, request.Shuffled, request.Cards)
 	if err != nil {
 		s.log.Error().Err(err).Msg("failed to create a new french card deck")
 		respond.NewResponse(w).DefaultMessage().InternalServerError(nil)
@@ -63,6 +66,8 @@ func (s *Service) CreateDeck(w http.ResponseWriter, req *http.Request) {
 		Shuffled:  deck.Shuffled,
 		Remaining: deck.Remaining,
 	}
+
+	s.log.Debug().Interface("response", response).Msg("sending create deck response")
 
 	respond.NewResponse(w).DefaultMessage().Ok(response)
 }
