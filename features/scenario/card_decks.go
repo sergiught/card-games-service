@@ -109,5 +109,22 @@ func (deckCtx *DeckContext) iShouldHaveTheFollowingCardsInThisOrder(ctx context.
 }
 
 func (deckCtx *DeckContext) iShouldHaveTheCardsInAShuffledOrder(ctx context.Context) error {
-	return godog.ErrPending
+	query := `SELECT cards FROM card_decks WHERE deck_id = $1`
+
+	row := deckCtx.database.QueryRowContext(ctx, query, deckCtx.response["deck_id"])
+
+	var cardsJSON string
+
+	err := row.Scan(&cardsJSON)
+	require.NoError(godog.T(ctx), err)
+
+	var cards []deck.FrenchCard
+	err = json.Unmarshal([]byte(cardsJSON), &cards)
+	require.NoError(godog.T(ctx), err)
+
+	standardCardsInDeck := deck.GenerateStandardFrenchCardsForDeck()
+
+	assert.NotEqual(godog.T(ctx), standardCardsInDeck, cards)
+
+	return nil
 }
