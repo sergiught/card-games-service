@@ -17,11 +17,11 @@ func main() {
 
 	log := logger.New(configuration.Environment)
 
-	httpRouter := router.New()
+	httpRouter := router.New(log)
 
 	httpServer := server.New(configuration.Server, log, httpRouter)
 
 	if err := httpServer.Start(); err != nil {
-		log.Fatal().Err(err).Msg("server exiting")
+		log.Fatal().Err(err).Msg("server failure")
 	}
 }

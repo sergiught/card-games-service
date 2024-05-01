@@ -4,30 +4,58 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/nicklaw5/go-respond"
+	"github.com/rs/zerolog"
 )
 
 // Service for managing card decks.
-type Service struct{}
+type Service struct {
+	log zerolog.Logger
+}
 
 // NewService returns a new instance of Service.
-func NewService() *Service {
-	return &Service{}
+func NewService(log zerolog.Logger) *Service {
+	return &Service{
+		log: log,
+	}
+}
+
+// CreateDeckRequest represents the parameters
+// required to create a new deck of cards.
+type CreateDeckRequest struct {
+	Shuffled bool   `json:"shuffled"`
+	DeckType string `json:"deck_type"`
+}
+
+// CreateDeckResponse represents the response
+// returned after creating a new deck of cards.
+type CreateDeckResponse struct {
+	DeckID    string `json:"deck_id"`
+	Shuffled  bool   `json:"shuffled"`
+	Remaining int    `json:"remaining"`
 }
 
 // CreateDeck handles the creation of a new card deck.
-func (s *Service) CreateDeck(writer http.ResponseWriter, request *http.Request) {
-	var deck Deck
+func (s *Service) CreateDeck(w http.ResponseWriter, req *http.Request) {
+	var request CreateDeckRequest
 
-	if err := json.NewDecoder(request.Body).Decode(&deck); err != nil {
-		respond.NewResponse(writer).DefaultMessage().BadRequest(nil)
+	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+		s.log.Error().Err(err).Msg("failed to decode request body")
+		respond.NewResponse(w).DefaultMessage().BadRequest(nil)
 		return
 	}
 
-	// We're just making the tests pass.
-	deck.ID = uuid.New()
-	deck.Remaining = 52
+	deck, err := NewWithFrenchCards(request.DeckType, request.Shuffled)
+	if err != nil {
+		s.log.Error().Err(err).Msg("failed to create a new french card deck")
+		respond.NewResponse(w).DefaultMessage().InternalServerError(nil)
+	}
 
-	respond.NewResponse(writer).DefaultMessage().Ok(deck)
+	response := CreateDeckResponse{
+		DeckID:    deck.ID.String(),
+		Shuffled:  deck.Shuffled,
+		Remaining: deck.Remaining,
+	}
+
+	respond.NewResponse(w).DefaultMessage().Ok(response)
 }
