@@ -9,6 +9,7 @@ import (
 
 	"github.com/sergiught/card-games-service/features/scenario"
 	"github.com/sergiught/card-games-service/internal/config"
+	"github.com/sergiught/card-games-service/internal/database"
 )
 
 const (
@@ -21,7 +22,10 @@ func TestFeatures(t *testing.T) {
 	configuration, err := config.LoadFromEnv()
 	require.NoError(t, err)
 
-	deckCtx := scenario.NewDeckContext(configuration)
+	db, err := database.Connect(configuration.Database)
+	require.NoError(t, err)
+
+	deckCtx := scenario.NewDeckContext(configuration, db)
 
 	suite := godog.TestSuite{
 		Name:                testSuiteName,

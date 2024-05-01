@@ -9,6 +9,8 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/sergiught/card-games-service/internal/deck"
 )
 
 // Initialize steps for the CreateFrenchDeck.feature scenarios.
@@ -67,7 +69,24 @@ func (deckCtx *DeckContext) iShouldReceiveNCards(ctx context.Context, cardsCount
 }
 
 func (deckCtx *DeckContext) iShouldHaveTheFollowingCardsInThisOrder(ctx context.Context, cardsTable *godog.Table) error {
-	return godog.ErrPending
+	query := `SELECT cards FROM card_decks WHERE deck_id = $1`
+
+	row := deckCtx.database.QueryRowContext(ctx, query, deckCtx.response["deck_id"])
+
+	var cardsJSON string
+
+	err := row.Scan(&cardsJSON)
+	require.NoError(godog.T(ctx), err)
+
+	var cards []deck.FrenchCard
+	err = json.Unmarshal([]byte(cardsJSON), &cards)
+	require.NoError(godog.T(ctx), err)
+
+	cardsFromTable := deckCtx.parseCardsTable(ctx, cardsTable)
+
+	assert.Equal(godog.T(ctx), cardsFromTable, cards)
+
+	return nil
 }
 
 func (deckCtx *DeckContext) iShouldHaveTheCardsInAShuffledOrder(ctx context.Context) error {

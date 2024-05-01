@@ -21,32 +21,6 @@ Feature: Create a deck of French cards
       | JACK  | SPADES  | JS   |
       | QUEEN | SPADES  | QS   |
       | KING  | SPADES  | KS   |
-      | ACE   | HEARTS  | AH   |
-      | 2     | HEARTS  | 2H   |
-      | 3     | HEARTS  | 3H   |
-      | 4     | HEARTS  | 4H   |
-      | 5     | HEARTS  | 5H   |
-      | 6     | HEARTS  | 6H   |
-      | 7     | HEARTS  | 7H   |
-      | 8     | HEARTS  | 8H   |
-      | 9     | HEARTS  | 9H   |
-      | 10    | HEARTS  | 10H  |
-      | JACK  | HEARTS  | JH   |
-      | QUEEN | HEARTS  | QH   |
-      | KING  | HEARTS  | KH   |
-      | ACE   | CLUBS   | AC   |
-      | 2     | CLUBS   | 2C   |
-      | 3     | CLUBS   | 3C   |
-      | 4     | CLUBS   | 4C   |
-      | 5     | CLUBS   | 5C   |
-      | 6     | CLUBS   | 6C   |
-      | 7     | CLUBS   | 7C   |
-      | 8     | CLUBS   | 8C   |
-      | 9     | CLUBS   | 9C   |
-      | 10    | CLUBS   | 10C  |
-      | JACK  | CLUBS   | JC   |
-      | QUEEN | CLUBS   | QC   |
-      | KING  | CLUBS   | KC   |
       | ACE   | DIAMONDS| AD   |
       | 2     | DIAMONDS| 2D   |
       | 3     | DIAMONDS| 3D   |
@@ -60,6 +34,32 @@ Feature: Create a deck of French cards
       | JACK  | DIAMONDS| JD   |
       | QUEEN | DIAMONDS| QD   |
       | KING  | DIAMONDS| KD   |
+      | ACE   | CLUBS   | AC   |
+      | 2     | CLUBS   | 2C   |
+      | 3     | CLUBS   | 3C   |
+      | 4     | CLUBS   | 4C   |
+      | 5     | CLUBS   | 5C   |
+      | 6     | CLUBS   | 6C   |
+      | 7     | CLUBS   | 7C   |
+      | 8     | CLUBS   | 8C   |
+      | 9     | CLUBS   | 9C   |
+      | 10    | CLUBS   | 10C  |
+      | JACK  | CLUBS   | JC   |
+      | QUEEN | CLUBS   | QC   |
+      | KING  | CLUBS   | KC   |
+      | ACE   | HEARTS  | AH   |
+      | 2     | HEARTS  | 2H   |
+      | 3     | HEARTS  | 3H   |
+      | 4     | HEARTS  | 4H   |
+      | 5     | HEARTS  | 5H   |
+      | 6     | HEARTS  | 6H   |
+      | 7     | HEARTS  | 7H   |
+      | 8     | HEARTS  | 8H   |
+      | 9     | HEARTS  | 9H   |
+      | 10    | HEARTS  | 10H  |
+      | JACK  | HEARTS  | JH   |
+      | QUEEN | HEARTS  | QH   |
+      | KING  | HEARTS  | KH   |
 
   Scenario: Create a custom deck of French cards
     When I create a "custom" deck of French cards with the following cards in this order:
