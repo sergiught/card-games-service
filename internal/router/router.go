@@ -20,6 +20,7 @@ func New(log zerolog.Logger, db *sql.DB) http.Handler {
 
 	router.HandlerFunc(http.MethodPost, "/decks", deckService.CreateDeck)
 	router.HandlerFunc(http.MethodGet, "/decks/:id", deckService.OpenDeck)
+	router.HandlerFunc(http.MethodPost, "/decks/:id/draw", deckService.DrawCards)
 
 	return router
 }

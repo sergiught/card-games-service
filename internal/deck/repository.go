@@ -4,12 +4,20 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
+)
+
+var (
+	// ErrNotEnoughCards is an error that indicates that we are
+	// about to draw more cards than available in the deck.
+	ErrNotEnoughCards = errors.New("not enough cards in the deck")
 )
 
 // RepositoryOperator is an interface with allowed deck repository methods.
 type RepositoryOperator interface {
 	CreateDeck(ctx context.Context, deck *Deck) error
 	OpenDeck(ctx context.Context, deckID string) (*Deck, error)
+	DrawCards(ctx context.Context, deckID string, cardsToDraw int) ([]FrenchCard, error)
 }
 
 // Repository allows for interacting with
@@ -64,4 +72,45 @@ func (r *Repository) OpenDeck(ctx context.Context, deckID string) (*Deck, error)
 	deck.Cards = cards
 
 	return &deck, nil
+}
+
+// DrawCards draws N cards from a given card deck in the database.
+func (r *Repository) DrawCards(ctx context.Context, deckID string, cardsToDraw int) ([]FrenchCard, error) {
+	tx, err := r.database.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	query := `SELECT cards FROM card_decks WHERE deck_id = $1`
+	row := tx.QueryRowContext(ctx, query, deckID)
+
+	var cardsJSON string
+	if err := row.Scan(&cardsJSON); err != nil {
+		return nil, errors.Join(err, tx.Rollback())
+	}
+
+	var frenchCards []FrenchCard
+	if err := json.Unmarshal([]byte(cardsJSON), &frenchCards); err != nil {
+		return nil, errors.Join(err, tx.Rollback())
+	}
+
+	if len(frenchCards) < cardsToDraw {
+		return nil, errors.Join(ErrNotEnoughCards, tx.Rollback())
+	}
+
+	drawnCards := frenchCards[:cardsToDraw]
+	remainingCards := frenchCards[cardsToDraw:]
+
+	updatedSerializedCards, err := json.Marshal(remainingCards)
+	if err != nil {
+		return nil, errors.Join(err, tx.Rollback())
+	}
+
+	query = `UPDATE card_decks SET cards = $1, remaining = $2 WHERE deck_id = $3`
+	_, err = tx.ExecContext(ctx, query, updatedSerializedCards, len(remainingCards), deckID)
+	if err != nil {
+		return nil, errors.Join(err, tx.Rollback())
+	}
+
+	return drawnCards, tx.Commit()
 }

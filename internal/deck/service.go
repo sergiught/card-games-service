@@ -89,3 +89,44 @@ func (s *Service) OpenDeck(w http.ResponseWriter, req *http.Request) {
 
 	respond.NewResponse(w).DefaultMessage().Ok(deck)
 }
+
+// DrawCardsRequest represents the parameters
+// required to draw cards from a deck.
+type DrawCardsRequest struct {
+	Cards int `json:"cards"`
+}
+
+// DrawCardsResponse represents the response
+// returned after drawing cards from a deck.
+type DrawCardsResponse struct {
+	Cards []FrenchCard `json:"cards"`
+}
+
+// DrawCards draws N cards from a given card deck.
+func (s *Service) DrawCards(w http.ResponseWriter, req *http.Request) {
+	params := httprouter.ParamsFromContext(req.Context())
+	deckID := params.ByName("id")
+
+	var request DrawCardsRequest
+
+	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+		s.log.Error().Err(err).Msg("failed to decode request body")
+		respond.NewResponse(w).DefaultMessage().BadRequest(nil)
+		return
+	}
+
+	drawnCards, err := s.repository.DrawCards(req.Context(), deckID, request.Cards)
+	if err != nil {
+		s.log.Error().Err(err).Msg("failed to draw french cards from deck")
+		respond.NewResponse(w).DefaultMessage().InternalServerError(nil)
+		return
+	}
+
+	response := DrawCardsResponse{
+		Cards: drawnCards,
+	}
+
+	s.log.Debug().Interface("response", response).Msg("sending draw cards response")
+
+	respond.NewResponse(w).DefaultMessage().Ok(response)
+}

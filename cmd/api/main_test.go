@@ -32,6 +32,7 @@ func TestFeatures(t *testing.T) {
 		ScenarioInitializer: func(ctx *godog.ScenarioContext) {
 			scenario.RegisterCreateDeckSteps(ctx, deckCtx)
 			scenario.RegisterOpenDeckSteps(ctx, deckCtx)
+			scenario.RegisterDrawCardsSteps(ctx, deckCtx)
 		},
 		Options: &godog.Options{
 			Format:   testSuiteFormat,
