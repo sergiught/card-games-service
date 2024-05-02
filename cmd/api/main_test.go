@@ -1,3 +1,5 @@
+//go:build features
+
 package main_test
 
 import (

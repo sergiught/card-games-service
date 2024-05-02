@@ -43,9 +43,13 @@ lint: $(GO_BIN)/golangci-lint
 lint-commits: $(GO_BIN)/commitlint
 	@commitlint lint
 
+test-unit:
+	@echo "==> Running unit tests"
+	@go test -v -race -count=1 ./...
+
 test-features:
 	@echo "==> Running feature tests"
-	@docker-compose exec card-games-service go test -v -race -count=1 -timeout=10m -run TestFeatures/"$(FILTER)" ./cmd/api/main_test.go
+	@docker-compose exec card-games-service go test -v -race -count=1 -tags=features -timeout=10m -run TestFeatures/"$(FILTER)" ./cmd/api/main_test.go
 
 dev-migrate-create: $(GO_BIN)/migrate
 	@echo "==> Creating database migration files"
