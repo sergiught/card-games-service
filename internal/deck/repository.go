@@ -5,9 +5,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 var (
+	// ErrDeckNotFound is an error that indicates that
+	// the deck ID was not found in the database.
+	ErrDeckNotFound = errors.New("deck not found")
+
 	// ErrNotEnoughCards is an error that indicates that we are
 	// about to draw more cards than available in the deck.
 	ErrNotEnoughCards = errors.New("not enough cards in the deck")
@@ -56,6 +61,9 @@ func (r *Repository) OpenDeck(ctx context.Context, deckID string) (*Deck, error)
 	var cardsJSON string
 
 	if err := row.Scan(&deck.ID, &deck.Shuffled, &deck.Remaining, &cardsJSON); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w: %s", ErrDeckNotFound, deckID)
+		}
 		return nil, err
 	}
 
@@ -86,6 +94,9 @@ func (r *Repository) DrawCards(ctx context.Context, deckID string, cardsToDraw i
 
 	var cardsJSON string
 	if err := row.Scan(&cardsJSON); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.Join(fmt.Errorf("%w: %s", ErrDeckNotFound, deckID), tx.Rollback())
+		}
 		return nil, errors.Join(err, tx.Rollback())
 	}
 

@@ -61,3 +61,7 @@ Feature: Open a deck of French cards
       | JACK  | HEARTS  | JH   |
       | QUEEN | HEARTS  | QH   |
       | KING  | HEARTS  | KH   |
+
+  Scenario: Throw an error if we open a deck that does not exist
+    When I open the deck
+    Then I should see an error saying that the deck does not exist

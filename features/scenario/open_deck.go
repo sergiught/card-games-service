@@ -20,9 +20,18 @@ func RegisterOpenDeckSteps(ctx *godog.ScenarioContext, deckCtx *DeckContext) {
 		`^I should see that the deck has the following "(shuffled|sorted)" cards:$`,
 		deckCtx.iShouldSeeThatTheDeckHasTheFollowingCards,
 	)
+
+	ctx.Step(
+		`^I should see an error saying that the deck does not exist$`,
+		deckCtx.iShouldSeeAnErrorSayingThatTheDeckDoesNotExist,
+	)
 }
 
 func (deckCtx *DeckContext) iOpenTheDeck(ctx context.Context) error {
+	if deckCtx.response.DeckID == "" {
+		deckCtx.response.DeckID = "32b8ddd1-c09d-4ec9-b1bd-c601e0e75692" // Doesn't exist.
+	}
+
 	uri := "/decks/" + deckCtx.response.DeckID
 
 	deckCtx.rawResponse = deckCtx.sendRequest(ctx, http.MethodGet, uri, nil)
@@ -48,6 +57,17 @@ func (deckCtx *DeckContext) iShouldSeeThatTheDeckHasTheFollowingCards(
 	}
 
 	assert.ElementsMatch(godog.T(ctx), deckCtx.response.Cards, cardsFromTable)
+
+	return nil
+}
+
+func (deckCtx *DeckContext) iShouldSeeAnErrorSayingThatTheDeckDoesNotExist(ctx context.Context) error {
+	assert.Equal(godog.T(ctx), http.StatusNotFound, deckCtx.rawResponse.StatusCode)
+
+	err := json.NewDecoder(deckCtx.rawResponse.Body).Decode(&deckCtx.errorResponse)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), "deck not found: 32b8ddd1-c09d-4ec9-b1bd-c601e0e75692", deckCtx.errorResponse.Message)
 
 	return nil
 }

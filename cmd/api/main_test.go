@@ -3,6 +3,7 @@
 package main_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -37,6 +38,11 @@ func TestFeatures(t *testing.T) {
 			scenario.RegisterCreateDeckSteps(ctx, deckCtx)
 			scenario.RegisterOpenDeckSteps(ctx, deckCtx)
 			scenario.RegisterDrawCardsSteps(ctx, deckCtx)
+
+			ctx.After(func(ctx context.Context, scenario *godog.Scenario, err error) (context.Context, error) {
+				deckCtx.ResetContext()
+				return ctx, nil
+			})
 		},
 		Options: &godog.Options{
 			Format:   testSuiteFormat,

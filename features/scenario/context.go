@@ -22,8 +22,9 @@ type DeckContext struct {
 
 	database *sql.DB
 
-	rawResponse *http.Response
-	response    response
+	rawResponse   *http.Response
+	response      response
+	errorResponse errorResponse
 }
 
 type response struct {
@@ -33,12 +34,23 @@ type response struct {
 	Cards     []deck.FrenchCard `json:"cards"`
 }
 
+type errorResponse struct {
+	Message string `json:"message"`
+}
+
 // NewDeckContext returns a new DeckContext.
 func NewDeckContext(cfg *config.Specification, db *sql.DB) *DeckContext {
 	return &DeckContext{
 		config:   cfg,
 		database: db,
 	}
+}
+
+// ResetContext is triggered after each scenario in order to clean up the data.
+func (deckCtx *DeckContext) ResetContext() {
+	deckCtx.rawResponse = nil
+	deckCtx.response = response{}
+	deckCtx.errorResponse = errorResponse{}
 }
 
 func (deckCtx *DeckContext) sendRequest(ctx context.Context, method, uri string, body []byte) *http.Response {

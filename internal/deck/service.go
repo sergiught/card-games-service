@@ -2,6 +2,7 @@ package deck
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -21,6 +22,12 @@ func NewService(log zerolog.Logger, repository RepositoryOperator) *Service {
 		log:        log,
 		repository: repository,
 	}
+}
+
+// ErrorResponse represents the response
+// message when encountering an error.
+type ErrorResponse struct {
+	Message string `json:"message"`
 }
 
 // CreateDeckRequest represents the parameters
@@ -72,7 +79,7 @@ func (s *Service) CreateDeck(w http.ResponseWriter, req *http.Request) {
 
 	s.log.Debug().Interface("response", response).Msg("sending create deck response")
 
-	respond.NewResponse(w).DefaultMessage().Ok(response)
+	respond.NewResponse(w).Ok(response)
 }
 
 // OpenDeck handles the creation of a new card deck.
@@ -80,14 +87,25 @@ func (s *Service) OpenDeck(w http.ResponseWriter, req *http.Request) {
 	params := httprouter.ParamsFromContext(req.Context())
 	deckID := params.ByName("id")
 
+	s.log.Debug().Interface("deck_id", deckID).Msg("received open deck request")
+
 	deck, err := s.repository.OpenDeck(req.Context(), deckID)
 	if err != nil {
 		s.log.Error().Err(err).Str("deck_id", deckID).Msg("failed to open a french card deck")
-		respond.NewResponse(w).DefaultMessage().NotFound(nil)
+
+		if errors.Is(err, ErrDeckNotFound) {
+			message := ErrorResponse{Message: err.Error()}
+			respond.NewResponse(w).NotFound(message)
+			return
+		}
+
+		respond.NewResponse(w).DefaultMessage().InternalServerError(nil)
 		return
 	}
 
-	respond.NewResponse(w).DefaultMessage().Ok(deck)
+	s.log.Debug().Interface("response", deck).Msg("sending open deck response")
+
+	respond.NewResponse(w).Ok(deck)
 }
 
 // DrawCardsRequest represents the parameters
@@ -115,9 +133,24 @@ func (s *Service) DrawCards(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	s.log.Debug().Interface("request", request).Msg("received draw cards request")
+
 	drawnCards, err := s.repository.DrawCards(req.Context(), deckID, request.Cards)
 	if err != nil {
-		s.log.Error().Err(err).Msg("failed to draw french cards from deck")
+		s.log.Error().Err(err).Str("deck_id", deckID).Msg("failed to draw french cards from deck")
+
+		if errors.Is(err, ErrDeckNotFound) {
+			message := ErrorResponse{Message: err.Error()}
+			respond.NewResponse(w).NotFound(message)
+			return
+		}
+
+		if errors.Is(err, ErrNotEnoughCards) {
+			message := ErrorResponse{Message: err.Error()}
+			respond.NewResponse(w).BadRequest(message)
+			return
+		}
+
 		respond.NewResponse(w).DefaultMessage().InternalServerError(nil)
 		return
 	}
@@ -128,5 +161,5 @@ func (s *Service) DrawCards(w http.ResponseWriter, req *http.Request) {
 
 	s.log.Debug().Interface("response", response).Msg("sending draw cards response")
 
-	respond.NewResponse(w).DefaultMessage().Ok(response)
+	respond.NewResponse(w).Ok(response)
 }
