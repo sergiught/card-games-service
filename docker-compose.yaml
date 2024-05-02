@@ -1,4 +1,14 @@
 services:
+  card-games-service:
+    build:
+      context: .
+      dockerfile: infrastructure/dockerfiles/development/Dockerfile
+    volumes:
+      - .:/card-games-service
+    ports:
+      - "8000:8000"
+    command: "CompileDaemon -graceful-kill -build='make install' -command='card-games-service'"
+
   postgres:
     image: postgres:16.2-alpine3.19
     ports:

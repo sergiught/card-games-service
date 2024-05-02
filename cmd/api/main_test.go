@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cucumber/godog"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -19,6 +20,7 @@ const (
 )
 
 func TestFeatures(t *testing.T) {
+	_ = godotenv.Load("./../../.env")
 	configuration, err := config.LoadFromEnv()
 	require.NoError(t, err)
 

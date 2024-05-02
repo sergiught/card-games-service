@@ -9,10 +9,10 @@ import (
 
 // Config holds the configuration settings for the database.
 type Config struct {
-	DSN                   string        `envconfig:"DSN" default:"postgresql://dealer:password@localhost:5432/card_decks?sslmode=disable"`
-	MaxOpenConnections    int           `envconfig:"DATABASE_MAX_OPEN_CONNECTIONS" default:"10"`
-	MaxIdleConnections    int           `envconfig:"DATABASE_MAX_IDLE_CONNECTIONS" default:"10"`
-	ConnectionMaxLifetime time.Duration `envconfig:"DATABASE_CONNECTION_MAX_LIFETIME" default:"10m"`
+	DSN                   string        `envconfig:"DSN" required:"true"`
+	MaxOpenConnections    int           `envconfig:"MAX_OPEN_CONNECTIONS" default:"10"`
+	MaxIdleConnections    int           `envconfig:"MAX_IDLE_CONNECTIONS" default:"10"`
+	ConnectionMaxLifetime time.Duration `envconfig:"CONNECTION_MAX_LIFETIME" default:"10m"`
 }
 
 // Connect returns a postgres database connection.
