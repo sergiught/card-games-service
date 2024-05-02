@@ -4,9 +4,9 @@ Feature: Create a deck of French cards
   So that I can host a round of Poker
 
   Scenario: Create a standard deck of French cards
-    When I create a "standard" deck of French cards
-    Then I should receive "52" cards
-    And I should have the following cards in this order:
+    When I create a "standard" and "sorted" deck of French cards
+    Then I should see that a deck was created with "52" "sorted" cards
+    And the deck should have the following cards in "sorted" order:
       | value | suit    | code |
       | ACE   | SPADES  | AS   |
       | 2     | SPADES  | 2S   |
@@ -61,8 +61,8 @@ Feature: Create a deck of French cards
       | QUEEN | HEARTS  | QH   |
       | KING  | HEARTS  | KH   |
 
-  Scenario: Create a custom deck of French cards
-    When I create a "custom" deck of French cards with the following cards in this order:
+  Scenario: Create a custom and sorted deck of French cards
+    When I create a "custom" and "sorted" deck of French cards with the following cards:
       | value | suit    | code |
       | ACE   | SPADES  | AS   |
       | 2     | SPADES  | 2S   |
@@ -77,8 +77,8 @@ Feature: Create a deck of French cards
       | JACK  | SPADES  | JS   |
       | QUEEN | SPADES  | QS   |
       | KING  | SPADES  | KS   |
-    Then I should receive "13" cards
-    And I should have the following cards in this order:
+    Then I should see that a deck was created with "13" "sorted" cards
+    And the deck should have the following cards in "sorted" order:
       | value | suit    | code |
       | ACE   | SPADES  | AS   |
       | 2     | SPADES  | 2S   |
@@ -94,7 +94,35 @@ Feature: Create a deck of French cards
       | QUEEN | SPADES  | QS   |
       | KING  | SPADES  | KS   |
 
-  Scenario: Create a standard and shuffled deck of French cards
-    When I create a "standard" and "shuffled" deck of French cards
-    Then I should receive "52" cards
-    And I should have the cards in a shuffled order
+  Scenario: Create a custom and shuffled deck of French cards
+    When I create a "custom" and "shuffled" deck of French cards with the following cards:
+      | value | suit    | code |
+      | ACE   | SPADES  | AS   |
+      | 2     | SPADES  | 2S   |
+      | 3     | SPADES  | 3S   |
+      | 4     | SPADES  | 4S   |
+      | 5     | SPADES  | 5S   |
+      | 6     | SPADES  | 6S   |
+      | 7     | SPADES  | 7S   |
+      | 8     | SPADES  | 8S   |
+      | 9     | SPADES  | 9S   |
+      | 10    | SPADES  | 10S  |
+      | JACK  | SPADES  | JS   |
+      | QUEEN | SPADES  | QS   |
+      | KING  | SPADES  | KS   |
+    Then I should see that a deck was created with "13" "shuffled" cards
+    And the deck should have the following cards in "shuffled" order:
+      | value | suit    | code |
+      | ACE   | SPADES  | AS   |
+      | 2     | SPADES  | 2S   |
+      | 3     | SPADES  | 3S   |
+      | 4     | SPADES  | 4S   |
+      | 5     | SPADES  | 5S   |
+      | 6     | SPADES  | 6S   |
+      | 7     | SPADES  | 7S   |
+      | 8     | SPADES  | 8S   |
+      | 9     | SPADES  | 9S   |
+      | 10    | SPADES  | 10S  |
+      | JACK  | SPADES  | JS   |
+      | QUEEN | SPADES  | QS   |
+      | KING  | SPADES  | KS   |

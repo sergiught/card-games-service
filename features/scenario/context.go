@@ -22,8 +22,15 @@ type DeckContext struct {
 
 	database *sql.DB
 
-	response             map[string]interface{}
-	checkCardsInResponse bool
+	rawResponse *http.Response
+	response    response
+}
+
+type response struct {
+	DeckID    string            `json:"deck_id"`
+	Shuffled  bool              `json:"shuffled"`
+	Remaining int               `json:"remaining"`
+	Cards     []deck.FrenchCard `json:"cards"`
 }
 
 // NewDeckContext returns a new DeckContext.

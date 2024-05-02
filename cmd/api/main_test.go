@@ -28,8 +28,11 @@ func TestFeatures(t *testing.T) {
 	deckCtx := scenario.NewDeckContext(configuration, db)
 
 	suite := godog.TestSuite{
-		Name:                testSuiteName,
-		ScenarioInitializer: scenario.Initialize(deckCtx),
+		Name: testSuiteName,
+		ScenarioInitializer: func(ctx *godog.ScenarioContext) {
+			scenario.RegisterCreateDeckSteps(ctx, deckCtx)
+			scenario.RegisterOpenDeckSteps(ctx, deckCtx)
+		},
 		Options: &godog.Options{
 			Format:   testSuiteFormat,
 			Paths:    []string{testSuiteDIR},
